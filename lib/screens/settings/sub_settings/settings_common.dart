@@ -65,6 +65,14 @@ class _SettingsCommonState extends State<SettingsCommon> {
                             });
                           },
                         ),
+                        Obx(() => AnymeXTile.toggle(
+                              icon: Icons.delete_outline_rounded,
+                              title: 'Confirm Repository Deletion',
+                              subtitle:
+                                  'Ask for confirmation before removing a repository.',
+                              value: settings.confirmRepositoryDeletion.value,
+                              onChanged: settings.saveConfirmRepositoryDeletion,
+                            )),
                         AnymeXTile.toggle(
                           icon: Icons.collections_bookmark_rounded,
                           title: 'Unified Library',

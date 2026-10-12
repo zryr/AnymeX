@@ -62,6 +62,7 @@ const settingsSearchIndex = <String, Map<String?, List<String>>>{
     null: [
       'Hide Adult Content',
       'Ask for tracking permission',
+      'Confirm Repository Deletion',
       'Show Continue Watching Card',
       'Manage Anilist Lists',
       'Manage MyAnimeList Lists',

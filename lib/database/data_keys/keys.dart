@@ -169,6 +169,7 @@ enum SourceKeys {
   mangaExtensionOrder,
   novelExtensionOrder,
   extensionsEnabled,
+  confirmRepositoryDeletion,
 }
 
 enum PluginKeys {

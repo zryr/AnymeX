@@ -41,6 +41,7 @@ class Settings extends GetxController {
   RxBool enableBetaUpdates = false.obs;
   RxBool writeLogToFile = false.obs;
   RxBool showHomeContinueWatching = true.obs;
+  RxBool confirmRepositoryDeletion = true.obs;
   Rxn<DisplayMode> preferredDisplayMode = Rxn<DisplayMode>();
   Rxn<DisplayMode> activeDisplayMode = Rxn<DisplayMode>();
   RxList<DisplayMode> supportedModes = <DisplayMode>[].obs;
@@ -104,6 +105,8 @@ class Settings extends GetxController {
     writeLogToFile.value = General.writeLogToFile.get<bool>(false);
     showHomeContinueWatching.value =
         General.showHomeContinueWatching.get<bool>(true);
+    confirmRepositoryDeletion.value =
+        SourceKeys.confirmRepositoryDeletion.get<bool>(true);
     customLogDirectory.value = General.customLogDirectory.get<String>("");
 
     downloadPath.value = DownloadKeys.downloadPath.get<String>("");
@@ -273,6 +276,11 @@ class Settings extends GetxController {
   void saveShowHomeContinueWatching(bool value) {
     showHomeContinueWatching.value = value;
     General.showHomeContinueWatching.set(value);
+  }
+
+  void saveConfirmRepositoryDeletion(bool value) {
+    confirmRepositoryDeletion.value = value;
+    SourceKeys.confirmRepositoryDeletion.set(value);
   }
 
   void showWelcomeDialog(BuildContext context) {

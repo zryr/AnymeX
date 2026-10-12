@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:anymex/controllers/settings/settings.dart';
 import 'package:anymex/controllers/source/source_controller.dart';
 import 'package:anymex/widgets/common/custom_tiles.dart';
 import 'package:anymex/utils/function.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:anymex/screens/settings/sub_settings/settings_extension_manager.dart';
 import 'package:anymex/widgets/anymex_widgets/anymex_text.dart';
+import 'package:anymex/screens/settings/sub_settings/widgets/repository_deletion_dialog.dart';
 
 class SettingsExtensions extends StatefulWidget {
   final Function()? onSave;
@@ -40,7 +42,8 @@ class _SettingsExtensionsState extends State<SettingsExtensions> {
   int _managerIndex = 0;
   ItemType _tab = ItemType.anime;
   bool _didApplyHighlightTab = false;
-  final Map<String, bool> _deleting = {};
+  final Map<(String?, String, ItemType), bool> _deleting = {};
+  bool _isConfirmingRepoDeletion = false;
 
   static const _typeTabs = [
     (label: 'Anime', icon: Icons.movie_creation_outlined, type: ItemType.anime),
@@ -119,7 +122,30 @@ class _SettingsExtensionsState extends State<SettingsExtensions> {
   }
 
   Future<void> _removeRepo(Repo repo, ItemType type) async {
-    final key = '${repo.url}_${type.name}';
+    final key = (repo.managerId, repo.url, type);
+    if (_isConfirmingRepoDeletion || _deleting[key] == true) return;
+
+    if (settingsController.confirmRepositoryDeletion.value) {
+      _isConfirmingRepoDeletion = true;
+      try {
+        final dontAskAgain = await showDialog<bool>(
+          context: context,
+          builder: (_) => RepositoryDeletionDialog(
+            repositoryName:
+                repo.name?.trim().isNotEmpty == true ? repo.name! : repo.url,
+          ),
+        );
+        // Only Delete returns a value; Cancel, Back and dismissal return null.
+        if (dontAskAgain == null || !mounted) return;
+        if (dontAskAgain) {
+          settingsController.saveConfirmRepositoryDeletion(false);
+        }
+      } finally {
+        _isConfirmingRepoDeletion = false;
+      }
+    }
+
+    if (!mounted) return;
     setState(() => _deleting[key] = true);
     try {
       await em.removeRepo(repo, type);
@@ -650,7 +676,7 @@ class _SettingsExtensionsState extends State<SettingsExtensions> {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (_, i) {
         final repo = repos[i];
-        final k = '${repo.url}_${_tab.name}';
+        final k = (repo.managerId, repo.url, _tab);
         return _buildRepoCard(repo, isDeleting: _deleting[k] == true);
       },
     );
